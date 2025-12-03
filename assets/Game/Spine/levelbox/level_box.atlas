@@ -1,0 +1,237 @@
+
+level_box.png
+size: 964,592
+format: RGBA4444
+filter: Linear,Linear
+repeat: none
+4xing
+  rotate: false
+  xy: 751, 8
+  size: 72, 72
+  orig: 73, 73
+  offset: 1, 0
+  index: -1
+box_box_d
+  rotate: false
+  xy: 676, 153
+  size: 84, 77
+  orig: 84, 77
+  offset: 0, 0
+  index: -1
+box_box_d2
+  rotate: false
+  xy: 762, 117
+  size: 84, 77
+  orig: 84, 77
+  offset: 0, 0
+  index: -1
+box_box_d2-1
+  rotate: false
+  xy: 676, 82
+  size: 84, 69
+  orig: 84, 77
+  offset: 0, 0
+  index: -1
+box_box_g
+  rotate: false
+  xy: 809, 196
+  size: 86, 59
+  orig: 86, 59
+  offset: 0, 0
+  index: -1
+box_box_g2
+  rotate: true
+  xy: 897, 169
+  size: 86, 59
+  orig: 86, 59
+  offset: 0, 0
+  index: -1
+box_jie
+  rotate: false
+  xy: 410, 2
+  size: 87, 45
+  orig: 87, 45
+  offset: 0, 0
+  index: -1
+box_jie2
+  rotate: false
+  xy: 499, 2
+  size: 87, 45
+  orig: 87, 45
+  offset: 0, 0
+  index: -1
+box_light
+  rotate: false
+  xy: 708, 232
+  size: 99, 92
+  orig: 99, 92
+  offset: 0, 0
+  index: -1
+box_pai
+  rotate: false
+  xy: 588, 10
+  size: 36, 37
+  orig: 36, 37
+  offset: 0, 0
+  index: -1
+gifthat01
+  rotate: false
+  xy: 183, 232
+  size: 204, 149
+  orig: 204, 149
+  offset: 0, 0
+  index: -1
+gifthat02
+  rotate: true
+  xy: 340, 383
+  size: 204, 149
+  orig: 204, 149
+  offset: 0, 0
+  index: -1
+gifthat03
+  rotate: true
+  xy: 183, 383
+  size: 204, 155
+  orig: 204, 155
+  offset: 0, 0
+  index: -1
+gifthe01
+  rotate: true
+  xy: 789, 395
+  size: 192, 171
+  orig: 192, 171
+  offset: 0, 0
+  index: -1
+gifthe02
+  rotate: true
+  xy: 598, 395
+  size: 192, 189
+  orig: 192, 189
+  offset: 0, 0
+  index: -1
+gifthe03
+  rotate: false
+  xy: 2, 7
+  size: 192, 207
+  orig: 192, 207
+  offset: 0, 0
+  index: -1
+giftjie01
+  rotate: true
+  xy: 196, 28
+  size: 202, 105
+  orig: 202, 105
+  offset: 0, 0
+  index: -1
+giftjie02
+  rotate: true
+  xy: 303, 28
+  size: 202, 105
+  orig: 202, 105
+  offset: 0, 0
+  index: -1
+giftjie03
+  rotate: true
+  xy: 491, 385
+  size: 202, 105
+  orig: 202, 105
+  offset: 0, 0
+  index: -1
+giftmao01
+  rotate: false
+  xy: 389, 250
+  size: 199, 131
+  orig: 199, 131
+  offset: 0, 0
+  index: -1
+giftmao02
+  rotate: true
+  xy: 410, 49
+  size: 199, 131
+  orig: 199, 131
+  offset: 0, 0
+  index: -1
+giftmao03
+  rotate: true
+  xy: 543, 49
+  size: 199, 131
+  orig: 199, 131
+  offset: 0, 0
+  index: -1
+giftstar003
+  rotate: false
+  xy: 708, 326
+  size: 109, 67
+  orig: 110, 67
+  offset: 1, 0
+  index: -1
+giftstar03
+  rotate: false
+  xy: 819, 257
+  size: 100, 83
+  orig: 100, 83
+  offset: 0, 0
+  index: -1
+gt1
+  rotate: true
+  xy: 590, 270
+  size: 113, 59
+  orig: 113, 59
+  offset: 0, 0
+  index: -1
+gt2
+  rotate: false
+  xy: 819, 342
+  size: 109, 51
+  orig: 113, 59
+  offset: 1, 0
+  index: -1
+gt3
+  rotate: true
+  xy: 651, 283
+  size: 110, 55
+  orig: 113, 59
+  offset: 3, 0
+  index: -1
+point
+  rotate: false
+  xy: 676, 7
+  size: 73, 73
+  orig: 81, 81
+  offset: 4, 4
+  index: -1
+star
+  rotate: true
+  xy: 626, 13
+  size: 34, 32
+  orig: 34, 32
+  offset: 0, 0
+  index: -1
+tx_point
+  rotate: true
+  xy: 2, 216
+  size: 371, 179
+  orig: 376, 183
+  offset: 3, 2
+  index: -1
+wp-luan
+  rotate: true
+  xy: 825, 29
+  size: 69, 58
+  orig: 69, 58
+  offset: 0, 0
+  index: -1
+wp-mofa
+  rotate: true
+  xy: 848, 100
+  size: 67, 69
+  orig: 67, 69
+  offset: 0, 0
+  index: -1
+wp-tui
+  rotate: false
+  xy: 885, 47
+  size: 68, 51
+  orig: 68, 51
+  offset: 0, 0
+  index: -1

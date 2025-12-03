@@ -1,0 +1,427 @@
+import { _decorator, Button, Node, Label, Sprite, ScrollView, director, UITransform, v3, ProgressBar, instantiate, tween, easing, v2, Tween } from 'cc';
+import { UIPool } from './UIPool';
+import { UIAssetFlyItem } from './UIAssetFlyItem';
+import { GoldTournamentV2AvatarItem } from './GoldTournamentV2AvatarItem';
+import { AsyncQueue } from './AsyncQueue';
+import { GlobalEvent } from './Events';
+import { ITEM } from './GameConst';
+import { MgrGoldTournamentV2 } from './MgrGoldTournamentV2';
+import { GoldRankRewardV2Cfg } from './GoldRankRewardV2Cfg';
+import { GoldRankV2Cfg } from './GoldRankV2Cfg';
+import { AvatarFrameItemType } from './GoldTournamentAvatarItem';
+import { AvatarFrame2Cfg } from './AvatarFrame2Cfg';
+import { MgrUser } from './MgrUser';
+import { TournamentStatus } from './GoldTournamentData';
+import { ViewAnimCtrl } from './ViewAnimCtrl';
+import { Language } from './Language';
+import { AssetsCfg } from './AssetsCfg';
+import { AnalyticsManager } from './AnalyticsManager';
+
+const { ccclass, property } = _decorator;
+
+@ccclass('GoldTournamentV2RewardView')
+export class GoldTournamentV2RewardView extends UIPool {
+    @property(Button)
+    confirmBtn: Button = null!;
+
+    @property(Node)
+    lightNode: Node = null!;
+
+    @property(Label)
+    rankLabel: Label = null!;
+
+    @property(Label)
+    descLabel: Label = null!;
+
+    @property(Node)
+    rewardNode: Node = null!;
+
+    @property(Node)
+    rewardGoldFlower: Node = null!;
+
+    @property(Label)
+    rewardGoldFlowerCnt: Label = null!;
+
+    @property(Sprite)
+    rewardItemSp: Sprite = null!;
+
+    @property(Label)
+    rewardItemCnt: Label = null!;
+
+    @property(Node)
+    avatarContent: Node = null!;
+
+    @property(Node)
+    progressBg: Node = null!;
+
+    @property(Node)
+    progressNode: Node = null!;
+
+    @property(Node)
+    gegangNode: Node = null!;
+
+    @property(Node)
+    goldFlowerNode: Node = null!;
+
+    @property(Label)
+    flowerLabel: Label = null!;
+
+    @property(ScrollView)
+    avatarRewardScroll: ScrollView = null!;
+
+    @property(UIAssetFlyItem)
+    flowerUIAssetFlyItem: UIAssetFlyItem = null!;
+
+    private _rankDatas: any = null;
+    private _rewardData: any = null;
+    private _avatarFrames: GoldTournamentV2AvatarItem[] = [];
+    private _itemLen: number = 0;
+    private _itemSize: any = null;
+    private _gegangStep: number = 0;
+    private _unlockFrameIds: number[] = [];
+    private _flyFrameNodes: Node[] = [];
+    private _resultAsync: AsyncQueue = null!;
+
+    onLoad() {
+        this.confirmBtn.node.on('click', this._onClickConfirm, this);
+        this._createAvatarFrame();
+        this._createProgress();
+    }
+
+    onEnable() {
+        director.on(GlobalEvent.AssetItemChange + ITEM.ChallengeStar, this._freshGoldFlower, this);
+        this._rankDatas = MgrGoldTournamentV2.Instance.getGoldTourRankIndexData();
+        
+        if (this._rankDatas && this._rankDatas.selfData) {
+            this._rewardData = GoldRankRewardV2Cfg.Instance.getRewardById(this._rankDatas.selfData.rank);
+            this._unlockFrameIds.length = 0;
+            this.confirmBtn.interactable = true;
+            this._freshGoldFlower();
+            this._startLightAction();
+            this._refreshInfo();
+            this._refreshProgressInfo();
+        } else {
+            console.error('no datas in tourRankReward.');
+        }
+    }
+
+    onDisable() {
+        this._stopLightAction();
+        this._stopFlyFrameNodes();
+        if (this._resultAsync) {
+            this._resultAsync.clear();
+            this._resultAsync = null;
+        }
+        director.targetOff(this);
+    }
+
+    onDestroy() {
+        this.clear();
+        this._avatarFrames.length = 0;
+    }
+
+    private _createAvatarFrame() {
+        const rewardMap = GoldRankV2Cfg.Instance.getGoldRankRewardMap();
+        const rewardIds = GoldRankV2Cfg.Instance.getGoldRankRewardIds();
+        this._itemLen = rewardIds.length + 2;
+
+        for (let i = 0; i < this._itemLen; i++) {
+            const itemNode = this.get();
+            itemNode.parent = this.avatarContent;
+            
+            if (!this._itemSize) {
+                this._itemSize = itemNode.getComponent(UITransform)!.contentSize;
+                this._gegangStep = this._itemSize.width / 4;
+            }
+            
+            itemNode.setPosition(v3(this._itemSize.width / 2 + i * this._itemSize.width, 0, 0));
+            
+            const avatarItem = itemNode.getComponent(GoldTournamentV2AvatarItem)!;
+            this._avatarFrames.push(avatarItem);
+            
+            if (i === 0 || i === this._itemLen - 1) {
+                avatarItem.setType(AvatarFrameItemType.Empty);
+            } else {
+                avatarItem.setType(AvatarFrameItemType.Item);
+                const frameCfg = AvatarFrame2Cfg.Instance.get(rewardIds[i - 1]);
+                avatarItem.refreshSp(frameCfg.id);
+                avatarItem.refreshLabel(rewardMap.get(frameCfg.id));
+            }
+        }
+
+        const contentSize = this.avatarContent.getComponent(UITransform)!.contentSize;
+        this.avatarContent.getComponent(UITransform)!.setContentSize(this._itemLen * this._itemSize.width, contentSize.height);
+        this.progressBg.setSiblingIndex(this.avatarContent.children.length);
+    }
+
+    private _createProgress() {
+        const progressWidth = (this._itemLen - 2) * this._itemSize.width;
+        const progressHeight = this.progressBg.getComponent(UITransform)!.contentSize.height;
+        this.progressBg.getComponent(UITransform)!.setContentSize(progressWidth, progressHeight);
+        
+        const progressNodeSize = this.progressNode.getComponent(UITransform)!.contentSize;
+        this.progressNode.getComponent(UITransform)!.setContentSize(progressWidth - 5, progressNodeSize.height);
+        this.progressNode.getComponent(ProgressBar)!.totalLength = progressWidth - 5;
+
+        const gegangCount = 4 * AvatarFrame2Cfg.Instance.sortCfg.length - 1;
+        for (let i = 0; i < gegangCount; i++) {
+            if (i !== 0) {
+                const gegang = instantiate(this.gegangNode);
+                gegang.parent = this.progressBg;
+                gegang.setPosition((i + 1) * this._gegangStep, 0, 0);
+            }
+        }
+    }
+
+    private _freshGoldFlower() {
+        this.flowerLabel.string = 'x' + MgrUser.Instance.userData.getItem(ITEM.ChallengeStar);
+    }
+
+    private _doSettleMent() {
+        MgrGoldTournamentV2.Instance.data.tourStatus = TournamentStatus.Rewarded;
+        MgrGoldTournamentV2.Instance.data.settlePeriod(MgrGoldTournamentV2.Instance.data.tourPeriod, this._rankDatas.selfData.rank);
+        
+        const goldCube = MgrGoldTournamentV2.Instance.data.goldCube;
+        const rank = this._rankDatas.selfData.rank;
+        const challengeStar = MgrUser.Instance.userData.getItem(ITEM.ChallengeStar);
+        const rewardStr = GoldRankRewardV2Cfg.Instance.getAllRewardStrById(this._rankDatas.selfData.rank);
+        
+        AnalyticsManager.getInstance().reportGoldGet({
+            Gold_Point: goldCube,
+            Gold_Rank: rank,
+            Gold_Type: 2,
+            Gold_Reward_Progress: challengeStar,
+            Reward: rewardStr
+        });
+    }
+
+    private _onClickConfirm() {
+        this.confirmBtn.interactable = false;
+        
+        if (!this._rewardData) {
+            this._doSettleMent();
+            this._close();
+            return;
+        }
+
+        const itemId = this._rewardData.itemId;
+        const itemCount = this._rewardData.itemCount;
+        const challengeStarType = ITEM.ChallengeStar;
+        const flowerCount = this._rewardData.flower;
+
+        if (itemCount > 0) {
+            MgrUser.Instance.userData.addMemItem(itemId, itemCount, 'GoldReward');
+        }
+        
+        if (flowerCount > 0) {
+            MgrUser.Instance.userData.addMemItem(challengeStarType, flowerCount, 'GoldReward');
+        }
+
+        const rewardMap = GoldRankV2Cfg.Instance.getGoldRankRewardMap();
+        const rewardIds = GoldRankV2Cfg.Instance.getGoldRankRewardIds();
+        
+        for (const [frameId, requiredStars] of rewardMap) {
+            if (MgrUser.Instance.userData.challengeStar >= requiredStars) {
+                if (!MgrUser.Instance.userData.unlockHeadFrame2.includes(frameId)) {
+                    MgrUser.Instance.userData.addUnlockHeadFrame2(frameId);
+                    this._unlockFrameIds.push(frameId);
+                }
+            }
+        }
+
+        this._doSettleMent();
+
+        const delayTime = 0.08;
+        this._resultAsync = new AsyncQueue();
+        
+        this._resultAsync.push((next) => {
+            const itemWorldPos = this.rewardItemSp.node.getWorldPosition();
+            const flowerWorldPos = this.rewardGoldFlower.getWorldPosition();
+
+            if (itemCount > 0) {
+                const currentCount = MgrUser.Instance.userData.getItem(itemId);
+                MgrUser.Instance.userData.flyAddItem({
+                    itemId: itemId,
+                    change: itemCount,
+                    result: currentCount,
+                    sourcePos: itemWorldPos
+                });
+            }
+
+            if (flowerCount > 0) {
+                const currentFlowers = MgrUser.Instance.userData.getItem(challengeStarType);
+                MgrUser.Instance.userData.flyAddItem({
+                    itemId: challengeStarType,
+                    change: flowerCount,
+                    result: currentFlowers,
+                    sourcePos: flowerWorldPos
+                });
+            }
+
+            this.scheduleOnce(next, 0.48);
+        });
+
+        this._resultAsync.push((next) => {
+            const progressInfo = this._getProgressInfo();
+            const progressBar = this.progressNode.getComponent(ProgressBar)!;
+            
+            tween(progressBar)
+                .to(0.64, { progress: progressInfo.progressNodePro }, { easing: easing.sineInOut })
+                .start();
+
+            const maxScrollOffset = this.avatarRewardScroll.getMaxScrollOffset();
+            const targetOffsetX = Math.min(progressInfo.progressHitIdx * this._itemSize.width, maxScrollOffset.x);
+            this.avatarRewardScroll.scrollToOffset(v2(targetOffsetX, 0), 0.64);
+
+            const targetPos = v3(progressInfo.goldFlowerNodeX, this.goldFlowerNode.position.y, this.goldFlowerNode.position.z);
+            tween(this.goldFlowerNode)
+                .to(0.64, { position: targetPos }, { easing: easing.sineInOut })
+                .start();
+
+            this.scheduleOnce(next, 0.72);
+        });
+
+        this._resultAsync.push((next) => {
+            if (this._unlockFrameIds.length <= 0) {
+                this.scheduleOnce(next, delayTime);
+            } else {
+                const highestFrameId = AvatarFrame2Cfg.Instance.getHightestLvInArray(this._unlockFrameIds);
+                
+                for (let i = 0; i < this._avatarFrames.length; i++) {
+                    const avatarFrame = this._avatarFrames[i];
+                    if (avatarFrame.frameId === highestFrameId) {
+                        const flyNode = this.get();
+                        const flyAvatar = flyNode.getComponent(GoldTournamentV2AvatarItem)!;
+                        flyAvatar.setType(AvatarFrameItemType.Fly);
+                        flyAvatar.refreshSp(highestFrameId);
+                        flyNode.parent = this.node;
+                        flyNode.setWorldPosition(avatarFrame.node.worldPosition);
+                        this._flyFrameNodes.push(flyNode);
+                    }
+                }
+
+                for (let i = 0; i < this._flyFrameNodes.length; i++) {
+                    const flyNode = this._flyFrameNodes[i];
+                    tween(flyNode)
+                        .to(0.64, { 
+                            worldPosition: v3(0, 0, 0),
+                            scale: v3(0.3, 0.3, 0.3)
+                        }, { easing: easing.backIn })
+                        .start();
+                }
+
+                this.scheduleOnce(next, 0.72);
+            }
+        });
+
+        this._resultAsync.complete = () => {
+            this._close();
+        };
+
+        this._resultAsync.play();
+    }
+
+    private _close() {
+        this.node.getComponent(ViewAnimCtrl)!.onClose();
+    }
+
+    private _refreshInfo() {
+        const rankStr = '' + this._rankDatas.selfData.rank;
+        this.rankLabel.string = Language.Instance.getLangByID('ui_gold_tour_rank').replace('%value', rankStr);
+        this.descLabel.string = Language.Instance.getLangByID('ui_gold_tour_rank_reward_tip').replace('%value', rankStr);
+
+        if (this._rewardData) {
+            this.rewardGoldFlowerCnt.string = this._rewardData.flower > 0 ? 'x' + this._rewardData.flower : 'x0';
+            this.rewardItemSp.node.active = this._rewardData.itemId >= 0;
+            this.rewardItemCnt.string = this._rewardData.itemId >= 0 ? 'x' + this._rewardData.itemCount : 'x0';
+            
+            if (this._rewardData.itemId >= 0) {
+                this.rewardItemSp.spriteFrame = AssetsCfg.Instance.getIconSpriteframe(this._rewardData.itemId);
+            }
+        } else {
+            this.rewardGoldFlowerCnt.string = 'x0';
+            this.rewardItemSp.node.active = false;
+        }
+    }
+
+    private _getProgressInfo() {
+        const challengeStar = MgrUser.Instance.userData.challengeStar;
+        const rewardMap = GoldRankV2Cfg.Instance.getGoldRankRewardMap();
+        const rewardIds = GoldRankV2Cfg.Instance.getGoldRankRewardIds();
+        
+        let currentIndex = -1;
+        let nextIndex = 0;
+
+        for (let i = rewardIds.length - 1; i >= 0; i--) {
+            const frameId = rewardIds[i];
+            if (challengeStar >= rewardMap.get(frameId)) {
+                currentIndex = i;
+                nextIndex = i + 1;
+                break;
+            }
+        }
+
+        const currentStars = currentIndex >= 0 ? rewardMap.get(rewardIds[currentIndex]) : 0;
+        const nextStars = nextIndex <= rewardIds.length - 1 ? rewardMap.get(rewardIds[nextIndex]) : rewardMap.get(rewardIds[rewardIds.length - 1]);
+        
+        const progressValue = challengeStar - currentStars;
+        let progressRatio = 0;
+        let flowerNodeX = 0;
+
+        if (nextIndex >= rewardIds.length) {
+            progressRatio = 1;
+        } else {
+            progressRatio = (currentIndex + 1) / rewardIds.length + progressValue / (nextStars - currentStars) * 1 / rewardIds.length;
+        }
+
+        if (nextIndex >= rewardIds.length) {
+            flowerNodeX = 4 * rewardIds.length * this._gegangStep;
+        } else {
+            flowerNodeX = 4 * (currentIndex + 1) * this._gegangStep + progressValue / (nextStars - currentStars) * 4 * this._gegangStep;
+        }
+
+        return {
+            progressHitIdx: currentIndex,
+            progressNodePro: progressRatio,
+            goldFlowerNodeX: flowerNodeX
+        };
+    }
+
+    private _refreshProgressInfo() {
+        const progressInfo = this._getProgressInfo();
+        this.progressNode.getComponent(ProgressBar)!.progress = progressInfo.progressNodePro;
+        
+        this.goldFlowerNode.setPosition(
+            progressInfo.goldFlowerNodeX,
+            this.goldFlowerNode.position.y,
+            this.goldFlowerNode.position.z
+        );
+        
+        this.flowerUIAssetFlyItem.register();
+
+        const maxScrollOffset = this.avatarRewardScroll.getMaxScrollOffset();
+        const targetOffsetX = Math.min(progressInfo.progressHitIdx * this._itemSize.width, maxScrollOffset.x);
+        this.avatarRewardScroll.scrollToOffset(v2(targetOffsetX, 0), 0.32);
+    }
+
+    private _stopFlyFrameNodes() {
+        this._flyFrameNodes.forEach((node) => {
+            Tween.stopAllByTarget(node);
+            this.put(node);
+        });
+        this._flyFrameNodes.length = 0;
+    }
+
+    private _startLightAction() {
+        tween(this.lightNode)
+            .set({ eulerAngles: v3(0, 0, 0) })
+            .to(18, { eulerAngles: v3(0, 0, -360) })
+            .union()
+            .repeatForever()
+            .start();
+    }
+
+    private _stopLightAction() {
+        Tween.stopAllByTarget(this.lightNode);
+    }
+}

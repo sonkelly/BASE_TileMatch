@@ -1,0 +1,209 @@
+
+TileClubEfx.png
+size: 512,1044
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+4
+  rotate: true
+  xy: 347, 232
+  size: 128, 140
+  orig: 128, 140
+  offset: 0, 0
+  index: -1
+4xing
+  rotate: false
+  xy: 262, 177
+  size: 80, 80
+  orig: 81, 81
+  offset: 1, 0
+  index: -1
+5
+  rotate: true
+  xy: 2, 144
+  size: 128, 140
+  orig: 128, 140
+  offset: 0, 0
+  index: -1
+6
+  rotate: false
+  xy: 2, 2
+  size: 128, 140
+  orig: 128, 140
+  offset: 0, 0
+  index: -1
+dizuo
+  rotate: false
+  xy: 344, 7
+  size: 94, 95
+  orig: 102, 102
+  offset: 4, 2
+  index: -1
+hand
+  rotate: true
+  xy: 176, 259
+  size: 121, 169
+  orig: 180, 180
+  offset: 24, 1
+  index: -1
+lightning11
+  rotate: false
+  xy: 2, 600
+  size: 174, 147
+  orig: 177, 150
+  offset: 2, 2
+  index: -1
+lightning12
+  rotate: true
+  xy: 352, 362
+  size: 170, 144
+  orig: 172, 146
+  offset: 1, 1
+  index: -1
+lightning13
+  rotate: false
+  xy: 176, 382
+  size: 170, 144
+  orig: 172, 146
+  offset: 1, 1
+  index: -1
+lightning14
+  rotate: true
+  xy: 353, 534
+  size: 171, 144
+  orig: 172, 146
+  offset: 1, 2
+  index: -1
+lightning21
+  rotate: true
+  xy: 2, 917
+  size: 123, 206
+  orig: 125, 208
+  offset: 1, 1
+  index: -1
+lightning22
+  rotate: false
+  xy: 395, 707
+  size: 103, 164
+  orig: 105, 167
+  offset: 1, 2
+  index: -1
+lightning23
+  rotate: true
+  xy: 2, 274
+  size: 103, 164
+  orig: 105, 167
+  offset: 1, 2
+  index: -1
+lightning24
+  rotate: false
+  xy: 398, 873
+  size: 105, 167
+  orig: 105, 167
+  offset: 0, 0
+  index: -1
+lightning31
+  rotate: true
+  xy: 210, 810
+  size: 167, 183
+  orig: 169, 185
+  offset: 1, 1
+  index: -1
+lightning32
+  rotate: true
+  xy: 178, 587
+  size: 159, 173
+  orig: 169, 185
+  offset: 7, 9
+  index: -1
+lightning33
+  rotate: true
+  xy: 2, 379
+  size: 160, 172
+  orig: 164, 175
+  offset: 1, 1
+  index: -1
+lightning34
+  rotate: true
+  xy: 2, 749
+  size: 166, 179
+  orig: 169, 185
+  offset: 3, 6
+  index: -1
+lightning41
+  rotate: true
+  xy: 210, 979
+  size: 61, 186
+  orig: 63, 189
+  offset: 1, 2
+  index: -1
+lightning42
+  rotate: true
+  xy: 2, 541
+  size: 57, 173
+  orig: 60, 175
+  offset: 2, 1
+  index: -1
+lightning43
+  rotate: true
+  xy: 177, 528
+  size: 57, 173
+  orig: 59, 175
+  offset: 1, 1
+  index: -1
+lightning44
+  rotate: true
+  xy: 183, 748
+  size: 60, 175
+  orig: 60, 175
+  offset: 0, 0
+  index: -1
+point
+  rotate: false
+  xy: 262, 95
+  size: 80, 80
+  orig: 90, 90
+  offset: 5, 5
+  index: -1
+quan
+  rotate: false
+  xy: 440, 32
+  size: 70, 70
+  orig: 70, 70
+  offset: 0, 0
+  index: -1
+shan
+  rotate: false
+  xy: 262, 21
+  size: 72, 72
+  orig: 72, 72
+  offset: 0, 0
+  index: -1
+star
+  rotate: false
+  xy: 353, 710
+  size: 38, 36
+  orig: 38, 36
+  offset: 0, 0
+  index: -1
+tx_bog
+  rotate: false
+  xy: 132, 2
+  size: 128, 140
+  orig: 128, 140
+  offset: 0, 0
+  index: -1
+tx_bog_efx
+  rotate: true
+  xy: 344, 104
+  size: 126, 130
+  orig: 128, 140
+  offset: 1, 5
+  index: -1
+yuan
+  rotate: false
+  xy: 144, 157
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
